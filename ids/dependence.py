@@ -15,10 +15,12 @@ def compute_IDS(X, Y=None, num_terms=6, p_norm='max', p_val=False, num_tests=100
     Parameters:
         X: np.ndarray or torch.Tensor
         Y: np.ndarray or torch.Tensor (optional)
-        backend: str, "torch" (default) or "numpy"
-
+        num_terms: Number of terms for Taylor series approximation (optional)
+        p_norm: String 'max' if using IDS-max.  1 or 2 for IDS-1, IDS-2, respectively.  (optional)
+        p_val: Boolean.  Indicates whether to compute p-values using permutation tests
+        num_tests: Number of permutation tests if p_val=True
     Returns:
-        IDS matrix
+        IDS matrix, p-value matrix (if p_val=True)
     """
 
     if backend == "numpy":
