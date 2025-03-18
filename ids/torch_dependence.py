@@ -22,7 +22,8 @@ def center(X):
     return X - torch.mean(X, axis=0, keepdims=True)
 
 
-def compute_p_val(C, X, Y=None, num_terms=6, p_norm='max', n_tests=100):
+def compute_p_val(C, X, Y=None, num_terms=6, 
+                  p_norm='max', n_tests=100, bandwidth_term=1/2):
 
     gt = C
     count = 0
@@ -40,9 +41,11 @@ def compute_p_val(C, X, Y=None, num_terms=6, p_norm='max', n_tests=100):
             random_noise = torch.randn(n, dy, device=Y.device)
             permutations = torch.argsort(random_noise, dim=0)
             Y_permuted = Y[permutations, torch.arange(dy).expand(n, dy)]        
-            null = compute_IDS_torch(X_permuted, Y=Y_permuted, num_terms=num_terms, p_norm=p_norm)
+            null = compute_IDS_torch(X_permuted, Y=Y_permuted, num_terms=num_terms, 
+                                     p_norm=p_norm, bandwidth_term=bandwidth_term)
         else:
-            null = compute_IDS_torch(X_permuted, Y=Y, num_terms=num_terms, p_norm=p_norm)
+            null = compute_IDS_torch(X_permuted, Y=Y, num_terms=num_terms, 
+                                     p_norm=p_norm, bandwidth_term=bandwidth_term)
 
 
         count += torch.where(null > gt, 1, 0)
@@ -51,14 +54,15 @@ def compute_p_val(C, X, Y=None, num_terms=6, p_norm='max', n_tests=100):
     return p_vals
 
 
-def compute_IDS_torch(X, Y=None, num_terms=6, p_norm='max', p_val=False, num_tests=100):
+def compute_IDS_torch(X, Y=None, num_terms=6, p_norm='max', 
+                      p_val=False, num_tests=100, bandwidth_term=1/2):
     n, dx = X.shape
-    X_t = transform(X, num_terms=num_terms)
+    X_t = transform(X, num_terms=num_terms, bandwidth_term=bandwidth_term)
     X_t = center(X_t)
 
     if Y is not None:
         _, dy = Y.shape
-        Y_t = transform(Y, num_terms=num_terms)
+        Y_t = transform(Y, num_terms=num_terms, bandwidth_term=bandwidth_term)
         Y_t = center(Y_t)        
         cov = X_t.T @ Y_t
         X_std = torch.sqrt(torch.sum(X_t**2, axis=0))
@@ -85,7 +89,8 @@ def compute_IDS_torch(X, Y=None, num_terms=6, p_norm='max', p_val=False, num_tes
         C = torch.mean(C, axis=1)
 
     if p_val:
-        p_vals = compute_p_val(C, X, Y=Y, num_terms=num_terms, p_norm=p_norm, n_tests=num_tests)
+        p_vals = compute_p_val(C, X, Y=Y, num_terms=num_terms, 
+                               p_norm=p_norm, n_tests=num_tests, bandwidth_term=bandwidth_term)
         return C, p_vals
     else: 
         return C
@@ -106,7 +111,8 @@ if __name__ == "__main__":
     # C = compute_IDS(X, Y, num_terms=6, p_norm='max')
     # print(C)
 
-    C, p_vals = compute_IDS_torch(X, Y, num_terms=6, p_norm='max', p_val=True, num_tests=1000)
+    C, p_vals = compute_IDS_torch(X, Y, num_terms=6, p_norm='max', 
+                                  p_val=True, num_tests=1000, bandwidth_term=1/2)
     print(C.shape)
     print(C)
     print(p_vals)
