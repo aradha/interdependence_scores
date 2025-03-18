@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ids"
 version = "0.1.0"
-dependencies = ["numpy"]
+dependencies = ["numpy", "tqdm"]
 authors = [
     {name = "Adityanarayanan Radhakrishnan", email = "aradha@mit.edu"},
     {name = "Yajit Jain", email = "yajit@broadinstitute.org"},
