@@ -33,7 +33,7 @@ ids.compute_IDS(X, Y)
 Notebooks demonstrating various use cases of IDS are provided in examples.
 
 ## Parameters
-The ```compute_IDS``` function supports the following variables: 
+The ```compute_IDS``` function supports the following parameters: 
 1. ```X``` - a matrix of size n samples by d variables
 2. ```Y``` (optional, default=None) - a matrix of size n samples x c variables
 3. ```num_terms``` (optional, default=6) - number of terms used in the Taylor series approximation of the Gaussian kernel 
